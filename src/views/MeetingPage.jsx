@@ -3,12 +3,12 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import OnlineList from "../components/OnlineList";
 import Chat from "../components/Chat";
-import New from "./New";
+import Modal from "../components/Modal";
 
 const socket = io.connect("http://localhost:8000");
 
 const MeetingPage = () => {
-  const [me, setMe] = useState("");
+  const [mySocketId, setMySocketId] = useState("");
   const [stream, setStream] = useState();
   const [idToCall, setIdToCall] = useState();
   const [recvCall, setRecvCall] = useState(false);
@@ -17,6 +17,9 @@ const MeetingPage = () => {
   const [caller, setCaller] = useState();
   const [name, setName] = useState();
   const [callerSignal, setCallerSignal] = useState();
+  const [remoteUser, setRemoteUser] = useState();
+  const [hideModal, setHideModal] = useState(true);
+  const [modalData, setModalData] = useState();
 
   const myVid = useRef();
   const remVid = useRef();
@@ -30,7 +33,7 @@ const MeetingPage = () => {
       });
 
     socket.on("me", (id) => {
-      setMe(id);
+      setMySocketId(id);
     });
     socket.on("callUser", (data) => {
       setRecvCall(true);
@@ -39,6 +42,15 @@ const MeetingPage = () => {
       setCallerSignal(data.signal);
     });
   }, []);
+
+  socket.on("invite", (data) => {
+    setHideModal(false);
+    setModalData(data);
+  });
+
+  socket.on("invAcc", (inv) => {
+    setRemoteUser(inv.to);
+  });
 
   const callUser = (id) => {
     const peer = new Peer({
@@ -51,7 +63,7 @@ const MeetingPage = () => {
       socket.emit("callUser", {
         userToCall: id,
         signalData: data,
-        from: me,
+        from: mySocketId,
         name,
       });
     });
@@ -89,10 +101,37 @@ const MeetingPage = () => {
     connRef.current.destroy();
   };
 
+  const toggleModal = () => {
+    return setHideModal(!hideModal);
+  };
+
+  useEffect(() => {
+    const handleTabClose = (event) => {
+      return socket.disconnect();
+    };
+
+    window.addEventListener("beforeunload", handleTabClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleTabClose);
+    };
+  }, []);
+
   return (
     <div className="flex flex-wrap p-3 justify-between">
+      <Modal
+        socket={socket}
+        toggleModal={toggleModal}
+        hideModal={hideModal}
+        modalData={modalData}
+        setRemoteUser={setRemoteUser}
+      />
       <div className="onlinelist">
-        <OnlineList />
+        <OnlineList
+          socket={socket}
+          mySocketId={mySocketId}
+          setRemoteUser={setRemoteUser}
+        />
       </div>
       <div className="campart w-700">
         <div className="bg-gray-800 rounded-xl p-3">
@@ -110,7 +149,7 @@ const MeetingPage = () => {
             <img src="https://i.pravatar.cc/300" alt="" loading="lazy" />
           )}
           <div className="text-white">
-            Leslie Online & Selected
+            My Socketid : {mySocketId}
             <br></br>
             {callAccepted && !callEnded ? (
               <button
@@ -126,14 +165,19 @@ const MeetingPage = () => {
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
                 onClick={() => callUser(idToCall)}
               >
-                Call
+                Start VideoCall
               </button>
             )}
           </div>
         </div>
       </div>
       <div className="flex flex-col items-center min-h-99 bg-gray-100 text-gray-800 p-10">
-        <New />
+        <Chat
+          socket={socket}
+          mySocketId={mySocketId}
+          remoteUser={remoteUser}
+          setRemoteUser={setRemoteUser}
+        />
       </div>
     </div>
   );
