@@ -3,6 +3,7 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import OnlineList from "../components/OnlineList";
 import Chat from "../components/Chat";
+import New from "./New";
 
 const socket = io.connect("http://localhost:8000");
 
@@ -132,7 +133,7 @@ const MeetingPage = () => {
         </div>
       </div>
       <div className="flex flex-col items-center min-h-99 bg-gray-100 text-gray-800 p-10">
-        <Chat />
+        <New />
       </div>
     </div>
   );
