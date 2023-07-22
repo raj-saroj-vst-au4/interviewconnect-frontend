@@ -105,18 +105,6 @@ const MeetingPage = () => {
     return setHideModal(!hideModal);
   };
 
-  useEffect(() => {
-    const handleTabClose = (event) => {
-      return socket.disconnect();
-    };
-
-    window.addEventListener("beforeunload", handleTabClose);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClose);
-    };
-  }, []);
-
   return (
     <div className="flex flex-wrap p-3 justify-between">
       <Modal
@@ -125,6 +113,7 @@ const MeetingPage = () => {
         hideModal={hideModal}
         modalData={modalData}
         setRemoteUser={setRemoteUser}
+        remoteUser={remoteUser}
       />
       <div className="onlinelist">
         <OnlineList
