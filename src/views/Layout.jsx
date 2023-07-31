@@ -66,12 +66,6 @@ const Layout = () => {
                     <div className="ml-4 flex items-center md:ml-6">
                       <button
                         type="button"
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-                      >
-                        Start Meeting
-                      </button>
-                      <button
-                        type="button"
                         className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
                       >
                         <span className="sr-only">View notifications</span>

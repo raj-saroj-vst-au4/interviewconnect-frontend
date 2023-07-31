@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 
-const OnlineList = ({ socket, mySocketId, setRemoteUser, remoteUser }) => {
+const OnlineList = ({
+  socket,
+  mySocketId,
+  setRemoteUser,
+  remoteUser,
+  myPeer,
+  setRemPeer,
+}) => {
   const [peoples, setPeoples] = useState([]);
 
   useEffect(() => {
@@ -34,6 +41,7 @@ const OnlineList = ({ socket, mySocketId, setRemoteUser, remoteUser }) => {
 
     socket.on("invAcc", (invData) => {
       setRemoteUser(invData.to);
+      setRemPeer(invData.remPeer);
       setPeoples((prevPeoples) =>
         prevPeoples.map((person) =>
           person.socket === invData.to
@@ -41,6 +49,7 @@ const OnlineList = ({ socket, mySocketId, setRemoteUser, remoteUser }) => {
             : person
         )
       );
+      console.log(invData.peer, " p2p connected ", invData.remPeer);
     });
   }, [socket]);
 
@@ -48,6 +57,7 @@ const OnlineList = ({ socket, mySocketId, setRemoteUser, remoteUser }) => {
     socket.emit("invite", {
       from: mySocketId,
       to: sid,
+      peer: myPeer,
     });
     setPeoples((prevPeoples) =>
       prevPeoples.map((person) =>
@@ -57,50 +67,60 @@ const OnlineList = ({ socket, mySocketId, setRemoteUser, remoteUser }) => {
   };
 
   return (
-    <ul role="list" className="divide-y divide-gray-100">
-      {peoples.map((person) =>
-        person.socket !== mySocketId ? (
-          <li
-            key={person?.socket}
-            className="flex justify-between gap-x-6 py-5"
-          >
-            <div className="flex gap-x-4">
-              <img
-                className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                src={person.dp}
-                alt=""
-              />
-              <div className="min-w-0 flex-auto">
-                <p className="text-sm font-semibold leading-6 text-gray-900">
-                  {person?.name}
-                </p>
-                <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                  {person?.socket}
-                </p>
-              </div>
-            </div>
-            <div className="hidden sm:flex sm:flex-col sm:items-end">
-              <p className="text-sm leading-6 text-gray-900">{person?.role}</p>
-
-              <div className="mt-1 flex items-center gap-x-1.5">
-                <div className="flex-none rounded-full bg-emerald-500/20 p-1">
-                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                </div>
-                <p className="text-xs leading-5 text-gray-500">Online</p>
-              </div>
-            </div>
-            <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4  rounded"
-              onClick={() => handleSwitch(person?.socket)}
+    <>
+      <h2 className="mb-2 text-lg font-semibold text-gray-900 text-center mt-3">
+        People Online
+      </h2>
+      <ul role="list" className="divide-y divide-gray-100">
+        {peoples.length === 0 && (
+          <div className="text-center">Nobody Online</div>
+        )}
+        {peoples.map((person) =>
+          person.socket !== mySocketId ? (
+            <li
+              key={person?.socket}
+              className="flex justify-between gap-x-6 p-5"
             >
-              {person?.status}
-            </button>
-          </li>
-        ) : (
-          ""
-        )
-      )}
-    </ul>
+              <div className="flex gap-x-4">
+                <img
+                  className="h-12 w-12 flex-none rounded-full bg-gray-50"
+                  src={person.dp}
+                  alt=""
+                />
+                <div className="min-w-0 flex-auto">
+                  <p className="text-sm font-semibold leading-6 text-gray-900">
+                    {person?.name}
+                  </p>
+                  <p className="mt-1 truncate text-xs leading-5 text-gray-500">
+                    {person?.socket}
+                  </p>
+                </div>
+              </div>
+              <div className="hidden sm:flex sm:flex-col sm:items-end">
+                <p className="text-sm leading-6 text-gray-900">
+                  {person?.role}
+                </p>
+
+                <div className="mt-1 flex items-center gap-x-1.5">
+                  <div className="flex-none rounded-full bg-emerald-500/20 p-1">
+                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </div>
+                  <p className="text-xs leading-5 text-gray-500">Online</p>
+                </div>
+              </div>
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => handleSwitch(person?.socket)}
+              >
+                {person?.status}
+              </button>
+            </li>
+          ) : (
+            ""
+          )
+        )}
+      </ul>
+    </>
   );
 };
 

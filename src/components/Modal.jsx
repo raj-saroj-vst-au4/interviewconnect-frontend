@@ -6,11 +6,17 @@ const Modal = ({
   hideModal,
   modalData,
   setRemoteUser,
+  myPeer,
+  setRemPeer,
 }) => {
   const handleInvAccept = () => {
     setRemoteUser(modalData?.from);
+    setRemPeer(modalData?.peer);
     console.log(`${modalData?.from} connected with ${modalData?.to}`);
+    console.log(`${modalData?.peer} connected with ${myPeer}`);
+
     toggleModal();
+    modalData.remPeer = myPeer;
     socket.emit("invAcc", modalData);
   };
   return (

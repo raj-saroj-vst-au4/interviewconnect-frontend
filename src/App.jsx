@@ -11,14 +11,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<MeetingPage />} />
-          {/* <Route
-            path="students"
-            element={
-              <div className="container mt-5">
-                {<StudentsManagement API_URL={API_URL} />}
-              </div>
-            }
-          /> */}
         </Route>
       </Routes>
     </BrowserRouter>
