@@ -5,8 +5,8 @@ import OnlineList from "../components/OnlineList";
 import Chat from "../components/Chat";
 import Modal from "../components/Modal";
 
-// const socket = io.connect("https://interviewconnect-backend-4a27.onrender.com");
-const socket = io.connect("http://localhost:8000");
+const socket = io.connect("https://interviewconnect-backend-4a27.onrender.com");
+// const socket = io.connect("http://localhost:8000");
 
 const MeetingPage = () => {
   const [mySocketId, setMySocketId] = useState("");
