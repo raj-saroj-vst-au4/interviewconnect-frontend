@@ -19,40 +19,10 @@ const MeetingPage = () => {
   const [remPeer, setRemPeer] = useState();
   const [remoteUser, setRemoteUser] = useState("");
   const [callStatus, setCallStatus] = useState(false);
-  const [backendReady, setBackendReady] = useState(false);
-  const [retries, setRetries] = useState(0);
-  const maxRetries = 30;
-  const retryInterval = 2000;
 
   const myVid = useRef();
   const remVid = useRef();
   const peerInstance = useRef();
-
-  const checkBackendStatus = async () => {
-    if (!backendReady) {
-      try {
-        const response = await fetch(
-          "https://interviewconnect-backend-4a27.onrender.com"
-        );
-        if (response.status === 200) {
-          setBackendReady(true);
-          console.log("Backend is up and running!");
-        } else {
-          console.log(
-            `Backend not yet ready. Retrying in ${
-              retryInterval / 1000
-            } seconds...`
-          );
-          setTimeout(checkBackendStatus, retryInterval);
-          setRetries((prevRetries) => prevRetries + 1);
-        }
-      } catch (error) {
-        console.error("Error while checking backend status:", error);
-        setTimeout(checkBackendStatus, retryInterval);
-        setRetries((prevRetries) => prevRetries + 1);
-      }
-    }
-  };
 
   useEffect(() => {
     socket.on("me", (id) => {
@@ -77,10 +47,6 @@ const MeetingPage = () => {
 
     peerInstance.current = peer;
   }, []);
-
-  useEffect(() => {
-    checkBackendStatus();
-  }, [backendReady, retries]);
 
   useEffect(() => {
     if (myVid.current) {
