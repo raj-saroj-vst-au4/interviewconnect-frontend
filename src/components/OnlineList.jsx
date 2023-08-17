@@ -12,8 +12,11 @@ const OnlineList = ({
 
   useEffect(() => {
     socket.on("serverliveList", async (livelist) => {
-      const promises = livelist.map(async (id) => {
-        if (id !== mySocketId) {
+      const peeps = livelist
+        .filter(async (id) => {
+          return id !== mySocketId;
+        })
+        .map(async (id) => {
           const userData = await fetch(
             "https://randomuser.me/api/?results=1&inc=name,gender,nat,email&noinfo",
             {
@@ -32,10 +35,9 @@ const OnlineList = ({
             socket: id,
             status: remoteUser === id ? "Connected" : "Initiate",
           };
-        }
-      });
+        });
 
-      const updatedPeoples = await Promise.all(promises);
+      const updatedPeoples = await Promise.all(peeps);
       setPeoples(updatedPeoples);
     });
 
@@ -71,14 +73,12 @@ const OnlineList = ({
       <h2 className="mb-2 text-lg font-semibold text-gray-900 text-center mt-3">
         People Online
       </h2>
+      {peoples.length === 0 && <div className="text-center">Nobody Online</div>}
       <ul role="list" className="divide-y divide-gray-100">
-        {peoples.length === 0 && (
-          <div className="text-center">Nobody Online</div>
-        )}
         {peoples.map((person) =>
           person.socket !== mySocketId ? (
             <li
-              key={person?.socket}
+              key={person.socket}
               className="flex justify-between gap-x-6 p-5"
             >
               <div className="flex gap-x-4">
@@ -89,17 +89,15 @@ const OnlineList = ({
                 />
                 <div className="min-w-0 flex-auto">
                   <p className="text-sm font-semibold leading-6 text-gray-900">
-                    {person?.name}
+                    {person.name}
                   </p>
                   <p className="mt-1 truncate text-xs leading-5 text-gray-500">
-                    {person?.socket}
+                    {person.socket}
                   </p>
                 </div>
               </div>
               <div className="hidden sm:flex sm:flex-col sm:items-end">
-                <p className="text-sm leading-6 text-gray-900">
-                  {person?.role}
-                </p>
+                <p className="text-sm leading-6 text-gray-900">{person.role}</p>
 
                 <div className="mt-1 flex items-center gap-x-1.5">
                   <div className="flex-none rounded-full bg-emerald-500/20 p-1">
@@ -110,7 +108,7 @@ const OnlineList = ({
               </div>
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => handleSwitch(person?.socket)}
+                onClick={() => handleSwitch(person.socket)}
               >
                 {person?.status}
               </button>
