@@ -110,7 +110,7 @@ const MeetingPage = () => {
   return (
     <div>
       {showMobileWarning ? (
-        alert("Mobile device detected or Webcam module not found")
+        alert("Desktop/Laptop with webcam module not detected")
       ) : mySocketId ? (
         <div className="grid grid-cols-5 gap-2 bg-gray-100 h-fit">
           <div className="modal absolute">
