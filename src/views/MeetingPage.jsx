@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "peerjs";
 import OnlineList from "../components/OnlineList";
@@ -7,8 +7,6 @@ import Modal from "../components/Modal";
 import Loader from "../components/Loader";
 
 const socket = io.connect("https://interviewconnect-backend-4a27.onrender.com");
-// const socket = io.connect("http://localhost:8000");
-
 const MeetingPage = () => {
   const [mySocketId, setMySocketId] = useState("");
   const [hideModal, setHideModal] = useState(true);
@@ -19,12 +17,15 @@ const MeetingPage = () => {
   const [remPeer, setRemPeer] = useState();
   const [remoteUser, setRemoteUser] = useState("");
   const [callStatus, setCallStatus] = useState(false);
+  const [showMobileWarning, setShowMobileWarning] = useState(false);
 
   const myVid = useRef();
   const remVid = useRef();
   const peerInstance = useRef();
 
   useEffect(() => {
+    if (window.innerWidth <= 800) setShowMobileWarning(true);
+
     socket.on("me", (id) => {
       setMySocketId(id);
     });
@@ -108,7 +109,9 @@ const MeetingPage = () => {
 
   return (
     <div>
-      {mySocketId ? (
+      {showMobileWarning ? (
+        alert("Mobile device detected or Webcam module not found")
+      ) : mySocketId ? (
         <div className="grid grid-cols-5 gap-2 bg-gray-100 h-fit">
           <div className="modal absolute">
             <Modal
